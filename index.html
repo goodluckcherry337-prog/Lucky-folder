@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>幸孕檔案夾 - 醫學指引版 v4.8</title>
+    <title>幸孕檔案夾 - 雲端安全備份版 v5.0</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -11,7 +11,7 @@
         :root { --pink-primary: #f472b6; --pink-dark: #db2777; }
         body { font-family: 'Noto Sans TC', sans-serif; background-color: #fffafb; color: #374151; -webkit-tap-highlight-color: transparent; }
         .card { background: white; border-radius: 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid #fee2e2; margin-bottom: 1rem; overflow: hidden; }
-        .btn-pink { background: var(--pink-primary); color: white; border-radius: 0.5rem; transition: all 0.2s; font-weight: bold; border: none; cursor: pointer; }
+        .btn-pink { background: var(--pink-primary); color: white; border-radius: 0.5rem; transition: all 0.2s; font-weight: bold; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .btn-pink:hover { background: var(--pink-dark); }
         .tab-active { border-bottom: 3px solid var(--pink-primary); color: var(--pink-primary); font-weight: bold; }
         input, select, textarea { border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 0.6rem; font-size: 0.875rem; width: 100%; }
@@ -21,6 +21,7 @@
         .delete-btn:hover { background-color: #fef2f2; color: #ef4444; }
         .modal-overlay { background: rgba(0,0,0,0.4); backdrop-filter: blur(2px); transition: all 0.3s; }
         .time-link { text-decoration: underline; cursor: pointer; color: #6b7280; }
+        .time-link:hover { color: var(--pink-primary); }
         .alert-text { font-size: 10px; font-weight: bold; margin-top: 4px; line-height: 1.4; }
         @keyframes pop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         .encourage-pop { animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -28,19 +29,52 @@
 </head>
 <body class="pb-20">
     <div class="max-w-md mx-auto p-4">
-        <header class="text-center py-6">
+        <!-- 頂部標頭 -->
+        <header class="text-center py-6 pb-2">
             <h1 class="text-2xl font-bold text-pink-600">幸孕檔案夾</h1>
-            <p class="text-[10px] text-gray-400 mt-1 tracking-widest uppercase font-bold">Maternal Health Guide v4.8</p>
+            <p class="text-[10px] text-gray-400 mt-1 tracking-widest uppercase font-bold">Maternal Health Guide v5.0</p>
         </header>
 
-        <nav class="flex border-b border-gray-100 mb-6 text-center text-[11px] sticky top-0 bg-white z-10 overflow-x-auto whitespace-nowrap">
-            <button onclick="showPage('bmi')" id="btn-bmi" class="px-4 py-3 tab-active">體重管理</button>
-            <button onclick="showPage('checkup')" id="btn-checkup" class="px-4 py-3 text-gray-400">產檢紀錄</button>
-            <button onclick="showPage('health')" id="btn-health" class="px-4 py-3 text-gray-400">血壓血糖</button>
-            <button onclick="showPage('exercise')" id="btn-exercise" class="px-4 py-3 text-gray-400">好孕動動</button>
-            <button onclick="showPage('data')" id="btn-data" class="px-4 py-3 text-gray-400">管理備份</button>
+        <!-- 帳號同步狀態列 (雙軌制) -->
+        <div class="mb-4">
+            <!-- 免登入狀態 (包含但書警告) -->
+            <div id="local-warning-box" class="p-3 bg-yellow-50 border border-yellow-200 rounded-xl text-xs flex flex-col justify-between items-center gap-2">
+                <div class="text-amber-800 flex-1 leading-relaxed">
+                    <span class="font-bold">⚠️ 免登入模式：</span>資料僅存於此瀏覽器中。清除快取、網頁資料或更換手機，紀錄將會<span class="font-bold text-red-500">永久消失</span>！建議登入 Google 進行安全備份。
+                </div>
+                <button onclick="signInGoogle()" class="w-full mt-1.5 py-2 bg-white border border-gray-300 text-gray-700 font-bold rounded-lg flex items-center justify-center gap-1.5 hover:bg-gray-50 transition text-xs shadow-sm">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21.35,11.1H12v2.7h5.38c-0.24,1.28 -0.96,2.37 -2.04,3.1v2.6h3.3c1.93,-1.78 3.04,-4.4 3.04,-7.4c0,-0.37 -0.03,-0.74 -0.09,-1.1z" fill="#4285F4" />
+                        <path d="M12,20.5c2.3,0 4.23,-0.76 5.64,-2.1l-3.3,-2.6c-0.9,0.6 -2.07,0.97 -3.34,0.97 -2.57,0 -4.75,-1.74 -5.53,-4.07H2.05v2.7c1.47,2.9 4.49,4.9 8.01,4.9z" fill="#34A853" />
+                        <path d="M6.47,12.7c-0.2,-0.6 -0.31,-1.24 -0.31,-1.9s0.11,-1.3 0.31,-1.9V6.2H2.05C1.3,7.7 0.9,9.4 0.9,11.2s0.4,3.5 1.15,5V13.5l3.27,-2.7z" fill="#FBBC05" />
+                        <path d="M12,5.27c1.25,0 2.37,0.43 3.25,1.27l2.43,-2.43C16.2,2.75 14.28,2 12,2 8.48,2 5.46,4 4,6.9l3.27,2.7c0.78,-2.33 2.96,-4.07 5.53,-4.07z" fill="#EA4335" />
+                    </svg>
+                    使用 Google 帳號安全登入
+                </button>
+            </div>
+
+            <!-- Google 已登入雲端備份狀態 -->
+            <div id="cloud-status-box" class="hidden p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs flex justify-between items-center gap-2">
+                <div class="text-emerald-800 flex-1 flex items-center gap-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>雲端安全備份中：已連結 <b><span id="cloud-username"></span></b></span>
+                </div>
+                <button onclick="signOutGoogle()" class="px-3 py-1 bg-white border border-red-200 text-red-500 font-bold rounded-lg hover:bg-red-50 transition text-xs shadow-sm">
+                    登出
+                </button>
+            </div>
+        </div>
+
+        <!-- 導覽列 -->
+        <nav class="flex border-b border-gray-100 mb-6 text-center text-xs sticky top-0 bg-white z-10 overflow-x-auto whitespace-nowrap">
+            <button onclick="showPage('bmi')" id="btn-bmi" class="flex-1 py-3 tab-active">體重管理</button>
+            <button onclick="showPage('checkup')" id="btn-checkup" class="flex-1 py-3 text-gray-400">產檢紀錄</button>
+            <button onclick="showPage('health')" id="btn-health" class="flex-1 py-3 text-gray-400">血壓血糖</button>
+            <button onclick="showPage('exercise')" id="btn-exercise" class="flex-1 py-3 text-gray-400">好孕動動</button>
+            <button onclick="showPage('data')" id="btn-data" class="flex-1 py-3 text-gray-400">備份管理</button>
         </nav>
 
+        <!-- 1. 體重管理 -->
         <section id="page-bmi" class="space-y-4">
             <div class="card p-3 bg-pink-50 border-pink-100">
                 <h4 class="text-xs font-bold text-pink-700 mb-2 flex items-center">💡 孕期增重建議參考表</h4>
@@ -79,6 +113,7 @@
             </div>
         </section>
 
+        <!-- 2. 產檢紀錄 -->
         <section id="page-checkup" class="hidden space-y-4">
             <div class="card p-4 border-t-4 border-pink-400">
                 <h3 class="font-bold text-gray-700 mb-4 text-sm flex justify-between items-center">
@@ -108,9 +143,11 @@
                 </div>
                 <button onclick="saveCheckup()" class="w-full btn-pink py-3 text-sm shadow-md">儲存紀錄</button>
             </div>
+            <h4 class="text-sm font-bold text-pink-600 px-1 mb-2 italic">歷史產檢存檔</h4>
             <div id="checkup-history" class="space-y-3"></div>
         </section>
 
+        <!-- 3. 血壓血糖 -->
         <section id="page-health" class="hidden space-y-4">
             <div class="card p-4 border-l-4 border-blue-400">
                 <h3 class="font-bold text-gray-700 mb-3 text-sm">日常血壓紀錄</h3>
@@ -126,7 +163,7 @@
                         <input type="number" id="bp-dia" placeholder="舒張壓">
                     </div>
                 </div>
-                <button onclick="addBP()" class="w-full btn-pink py-2 bg-blue-500">紀錄血壓</button>
+                <button onclick="addBP()" class="w-full btn-pink py-2 bg-blue-500 hover:bg-blue-600">紀錄血壓</button>
             </div>
 
             <div class="card p-4 border-l-4 border-green-400">
@@ -140,13 +177,14 @@
                     </select>
                     <input type="number" id="glu-val" placeholder="血糖值 mg/dL">
                 </div>
-                <button onclick="addGlu()" class="w-full btn-pink py-2 bg-green-500">紀錄血糖</button>
+                <button onclick="addGlu()" class="w-full btn-pink py-2 bg-green-500 hover:bg-green-600">紀錄血糖</button>
             </div>
             <div class="px-1 text-[10px] text-gray-400 italic">💡 備註：在紀錄列表按壓日期時間可回填修正數據</div>
             <div id="bp-list" class="space-y-2"></div>
             <div id="glu-list" class="space-y-2"></div>
         </section>
 
+        <!-- 好孕動動 -->
         <section id="page-exercise" class="hidden space-y-4">
             <div class="card p-4 border-l-4 border-purple-400">
                 <h3 class="font-bold text-gray-700 mb-3 text-sm flex justify-between items-center">
@@ -167,27 +205,66 @@
                         <span class="text-xs whitespace-nowrap text-gray-500 mt-5">分鐘</span>
                     </div>
                 </div>
-                <button onclick="addExercise()" class="w-full btn-pink py-2 bg-purple-500">儲存運動紀錄</button>
+                <button onclick="addExercise()" class="w-full btn-pink py-2 bg-purple-500 hover:bg-purple-650">儲存運動紀錄</button>
             </div>
             <div id="exercise-list" class="space-y-2"></div>
         </section>
 
+        <!-- 5. 備份管理 -->
         <section id="page-data" class="hidden space-y-4">
-            <div class="card p-6 text-center space-y-4">
-                <button onclick="exportData()" class="w-full btn-pink py-3">匯出 CSV 檔案</button>
-                <button onclick="triggerClearAll()" class="w-full py-2 text-red-400 text-xs border rounded mt-10">清空所有紀錄</button>
+            <div class="card p-5 space-y-4">
+                <h3 class="font-bold text-gray-700 text-sm border-l-4 border-pink-500 pl-2">☁️ 雲端與本機備份說明</h3>
+                <div class="text-[11px] text-gray-500 space-y-2 leading-relaxed">
+                    <p><span class="font-bold text-pink-600">本機存儲（免登入）：</span>紀錄保存在本瀏覽器中。若您清除快取、網頁資料或更換手機，<span class="text-red-500 font-bold">所有資料將永久遺失！</span></p>
+                    <p><span class="font-bold text-emerald-600">雲端備份（Google 登入）：</span>資料會自動加密備份至您的 Google 帳號下，即使更換手機或清除資料，只需再次登入即可瞬間還原！</p>
+                </div>
+            </div>
+
+            <div class="card p-5 space-y-4">
+                <h3 class="font-bold text-gray-700 text-sm border-l-4 border-indigo-500 pl-2">💾 手動匯入與匯出 (JSON)</h3>
+                <p class="text-[11px] text-gray-500 leading-relaxed">除了自動同步外，您也可以隨時手動下載純文字備份檔。</p>
+                <div class="grid grid-cols-1 gap-3">
+                    <button onclick="exportBackup()" class="w-full btn-pink py-2.5 bg-indigo-500 hover:bg-indigo-600">產生備份還原檔 (.json)</button>
+                    <div class="relative">
+                        <input type="file" id="importFile" class="hidden" onchange="importBackup(this)">
+                        <button onclick="document.getElementById('importFile').click()" class="w-full btn-pink py-2.5 bg-emerald-500 hover:bg-emerald-600">匯入並還原資料 (.json)</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-5 space-y-4">
+                <h3 class="font-bold text-gray-700 text-sm border-l-4 border-blue-400 pl-2">📊 報表與匯出</h3>
+                <button onclick="exportCSV()" class="w-full btn-pink py-3">匯出 Excel (CSV) 檔案</button>
+                <button onclick="triggerClearAll()" class="w-full py-2 text-red-400 text-xs border rounded mt-10">清空本地所有紀錄</button>
             </div>
         </section>
     </div>
 
-    <!-- 刪除彈窗 -->
+    <!-- 刪除確認彈窗 (Modal) -->
     <div id="confirmModal" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center p-6">
         <div class="bg-white rounded-2xl w-full max-w-xs p-6 shadow-2xl text-center">
-            <h3 class="text-lg font-bold text-gray-800 mb-2">確定要刪除嗎？</h3>
-            <p class="text-sm text-gray-500 mb-6">此動作無法復原。</p>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">確定執行嗎？</h3>
+            <p id="confirm-msg" class="text-sm text-gray-500 mb-6">此動作無法復原，請確認是否繼續？</p>
             <div class="flex gap-3">
                 <button onclick="closeModal()" class="flex-1 py-2 bg-gray-100 text-gray-600 rounded-lg font-bold">取消</button>
-                <button onclick="executeDelete()" class="flex-1 py-2 bg-red-500 text-white rounded-lg font-bold">確認刪除</button>
+                <button onclick="executeDelete()" id="confirm-btn" class="flex-1 py-2 bg-red-500 text-white rounded-lg font-bold">確認</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 雲端同步衝突彈窗 (Modal) -->
+    <div id="syncConflictModal" class="hidden fixed inset-0 z-50 modal-overlay flex items-center justify-center p-6">
+        <div class="bg-white rounded-2xl w-full max-w-sm p-6 shadow-2xl text-center animate-bounce-short">
+            <div class="text-4xl mb-2">🔄</div>
+            <h3 class="text-lg font-bold text-gray-800 mb-2">偵測到同步衝突</h3>
+            <p class="text-xs text-gray-500 mb-6 leading-relaxed">
+                我們在您的 Google 雲端發現了歷史備份，但您的這台手機也有本機資料，請選擇：
+            </p>
+            <div class="space-y-2.5">
+                <button onclick="handleSyncChoice('cloud')" class="w-full py-2.5 bg-pink-500 text-white rounded-lg font-bold text-xs shadow">採用雲端備份（覆蓋本機）</button>
+                <button onclick="handleSyncChoice('local')" class="w-full py-2.5 bg-blue-500 text-white rounded-lg font-bold text-xs shadow">將本機上傳（覆蓋雲端）</button>
+                <button onclick="handleSyncChoice('merge')" class="w-full py-2.5 bg-emerald-500 text-white rounded-lg font-bold text-xs shadow">合併兩者資料（保留完整紀錄）</button>
+                <button onclick="handleSyncChoice('cancel')" class="w-full py-2 bg-gray-100 text-gray-600 rounded-lg text-xs">暫時登出（保持免登入狀態）</button>
             </div>
         </div>
     </div>
@@ -202,11 +279,36 @@
         </div>
     </div>
 
+    <!-- 提示小浮窗 -->
     <div id="toast" class="hidden fixed top-20 left-1/2 -translate-x-1/2 z-[60] bg-gray-800 text-white px-4 py-2 rounded-full text-xs shadow-lg opacity-0 transition-all"></div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // --- Firebase 安全防護與模擬偵測 ---
+        let app, auth, db, appId;
+        let isFirebaseReady = false;
+        let isCloudSyncEnabled = localStorage.getItem('preg_cloud_sync_enabled') === 'true';
+        let currentUser = null; 
+
+        if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+            try {
+                const firebaseConfig = JSON.parse(__firebase_config);
+                app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                isFirebaseReady = true;
+            } catch (e) {
+                console.error("Firebase Initialization Failed", e);
+            }
+        }
+
+        // --- 資料核心 ---
         let userData = { profile: null, weights: [], checkups: {}, bp: [], glu: [], exercise: [] };
-        let pendingDelete = null; 
+        let pendingAction = null; 
         let chart = null;
 
         const encourageMsgs = [
@@ -214,8 +316,7 @@
             "妳剛才的活動讓血液循環更好了，寶寶也在裡面感覺很舒服喔！",
             "保持每天動一動，產後體力恢復會更快，妳真棒！",
             "媽咪今天的堅持，是給寶寶最好的健康禮物！",
-            "動完之後心情是不是變好了？妳正在做一件很偉大的事！",
-            "深呼吸，感受妳跟寶寶在一起運動的頻率，妳做得很好！"
+            "動完之後心情是不是變好了？妳正在做一件很偉大的事！"
         ];
 
         const checkupTemplates = [
@@ -226,12 +327,39 @@
             { id: 9, name: "額外產檢紀錄", week: 0 }
         ];
 
-        function init() {
-            const saved = localStorage.getItem('preg_pro_v4_8_final');
+        // --- 初始化 & 雙軌登入監聽 ---
+        async function init() {
+            // 先載入本機快取資料 (避免等待)
+            const saved = localStorage.getItem('preg_pro_v4_final_final');
             if(saved) userData = JSON.parse(saved);
+
             refreshTimeInputs();
+            
+            // 產檢選單
             const select = document.getElementById('cu-index');
             select.innerHTML = checkupTemplates.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+
+            // 初始化與檢測 Google 登入狀態
+            if (isFirebaseReady) {
+                onAuthStateChanged(auth, async (user) => {
+                    if (user && !user.isAnonymous && isCloudSyncEnabled) {
+                        handleUserLogin(user);
+                    } else {
+                        handleUserLogout();
+                    }
+                });
+            } else {
+                // 本機模擬環境測試
+                if (isCloudSyncEnabled) {
+                    handleUserLogin({
+                        uid: "simulated_user_12345",
+                        displayName: "孕媽咪好運連連"
+                    });
+                } else {
+                    handleUserLogout();
+                }
+            }
+
             loadCheckupTemplate();
             renderAll();
         }
@@ -246,8 +374,12 @@
             document.getElementById('cu-date').value = now.toISOString().split('T')[0];
         }
 
-        function save() {
-            localStorage.setItem('preg_pro_v4_8_final', JSON.stringify(userData));
+        // --- 存檔機制 (雙軌制) ---
+        async function save() {
+            localStorage.setItem('preg_pro_v4_final_final', JSON.stringify(userData));
+            if (currentUser && isCloudSyncEnabled) {
+                await saveCloudData(userData);
+            }
             renderAll();
         }
 
@@ -262,11 +394,186 @@
             }, 2500);
         }
 
+        // --- 雲端備份儲存與獲取 (RULE 1, 2, 3 遵守) ---
+        async function saveCloudData(data) {
+            if (!currentUser) return;
+            if (isFirebaseReady) {
+                try {
+                    // RULE 1: Strict paths /artifacts/{appId}/users/{userId}/{collectionName}
+                    const docRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'data', 'pregnancyState');
+                    await setDoc(docRef, { state: data }, { merge: true });
+                } catch (e) {
+                    console.error("Cloud saving failed", e);
+                    showToast("❌ 雲端同步失敗");
+                }
+            } else {
+                // 本機模擬雲端
+                localStorage.setItem('simulated_cloud_data', JSON.stringify(data));
+            }
+        }
+
+        // --- Google 帳號管理 ---
+        window.signInGoogle = async () => {
+            isCloudSyncEnabled = true;
+            localStorage.setItem('preg_cloud_sync_enabled', 'true');
+
+            if (isFirebaseReady) {
+                try {
+                    // RULE 3: Auth First
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                    const provider = new GoogleAuthProvider();
+                    const result = await signInWithPopup(auth, provider);
+                    handleUserLogin(result.user);
+                } catch (e) {
+                    console.error(e);
+                    showToast("❌ Google 登入失敗");
+                    handleUserLogout();
+                }
+            } else {
+                // 模擬模式
+                showToast("💡 進入本機模擬雲端登入狀態！");
+                handleUserLogin({
+                    uid: "simulated_user_12345",
+                    displayName: "幸孕媽咪"
+                });
+            }
+        };
+
+        window.signOutGoogle = async () => {
+            isCloudSyncEnabled = false;
+            localStorage.setItem('preg_cloud_sync_enabled', 'false');
+            if (isFirebaseReady) {
+                await signOut(auth);
+            }
+            handleUserLogout();
+            showToast("已登出 Google，返回免登入狀態");
+        };
+
+        async function handleUserLogin(user) {
+            currentUser = user;
+            document.getElementById('local-warning-box').classList.add('hidden');
+            document.getElementById('cloud-username').innerText = user.displayName || "幸孕媽咪";
+            document.getElementById('cloud-status-box').classList.remove('hidden');
+
+            let cloudData = null;
+            if (isFirebaseReady) {
+                try {
+                    const docRef = doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'pregnancyState');
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        cloudData = docSnap.data().state;
+                    }
+                } catch (e) {
+                    console.error("Cloud fetch failed", e);
+                }
+            } else {
+                const simSaved = localStorage.getItem('simulated_cloud_data');
+                if (simSaved) cloudData = JSON.parse(simSaved);
+            }
+
+            const localData = { ...userData };
+            const hasLocal = localData.profile || localData.weights.length > 0 || Object.keys(localData.checkups).length > 0 || localData.bp.length > 0 || localData.glu.length > 0 || localData.exercise.length > 0;
+
+            if (cloudData) {
+                if (hasLocal) {
+                    // 有雲端資料也有本地資料，跳出衝突處理
+                    window.tempCloudData = cloudData;
+                    document.getElementById('syncConflictModal').classList.remove('hidden');
+                } else {
+                    // 只有雲端有資料，直接下載
+                    userData = cloudData;
+                    save();
+                    showToast("🎉 已成功下載並同步您的雲端紀錄！");
+                }
+            } else {
+                // 雲端無資料，直接把本地資料上傳備份
+                if (hasLocal) {
+                    await saveCloudData(localData);
+                    showToast("🎉 已將您先前的本地資料上傳雲端存檔！");
+                } else {
+                    showToast("雲端同步已啟用，將會隨時備份新紀錄");
+                }
+            }
+        }
+
+        function handleUserLogout() {
+            currentUser = null;
+            isCloudSyncEnabled = false;
+            localStorage.setItem('preg_cloud_sync_enabled', 'false');
+            document.getElementById('cloud-status-box').classList.add('hidden');
+            document.getElementById('local-warning-box').classList.remove('hidden');
+            // 回復為本機存儲數據
+            const saved = localStorage.getItem('preg_pro_v4_final_final');
+            userData = saved ? JSON.parse(saved) : { profile: null, weights: [], checkups: {}, bp: [], glu: [], exercise: [] };
+            renderAll();
+        }
+
+        // 處理同步選擇
+        window.handleSyncChoice = async (choice) => {
+            document.getElementById('syncConflictModal').classList.add('hidden');
+            if (choice === 'cloud') {
+                userData = window.tempCloudData;
+                save();
+                showToast("已載入雲端備份，覆蓋本機");
+            } else if (choice === 'local') {
+                await saveCloudData(userData);
+                showToast("已成功將本地資料覆蓋至雲端");
+            } else if (choice === 'merge') {
+                userData = mergeData(userData, window.tempCloudData);
+                save();
+                showToast("🎉 資料合併成功並已同步雲端！");
+            } else {
+                signOutGoogle();
+            }
+            window.tempCloudData = null;
+        };
+
+        // 資料合併算法 (防止重複與資料丟失)
+        function mergeData(local, cloud) {
+            const merged = {
+                profile: local.profile || cloud.profile,
+                weights: [],
+                checkups: { ...cloud.checkups, ...local.checkups },
+                bp: [],
+                glu: [],
+                exercise: []
+            };
+
+            // 體重合併
+            const wMap = new Map();
+            [...(cloud.weights || []), ...(local.weights || [])].forEach(w => {
+                const exist = wMap.get(w.week);
+                if (!exist || w.id > exist.id) wMap.set(w.week, w);
+            });
+            merged.weights = Array.from(wMap.values()).sort((a,b) => a.week - b.week);
+
+            // 血壓/血糖/運動合併 (以唯一時間戳/時間為 Key)
+            const bpMap = new Map();
+            [...(cloud.bp || []), ...(local.bp || [])].forEach(b => bpMap.set(b.id || b.date, b));
+            merged.bp = Array.from(bpMap.values()).sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            const gluMap = new Map();
+            [...(cloud.glu || []), ...(local.glu || [])].forEach(g => gluMap.set(g.id || g.date, g));
+            merged.glu = Array.from(gluMap.values()).sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            const exMap = new Map();
+            [...(cloud.exercise || []), ...(local.exercise || [])].forEach(e => exMap.set(e.id || e.date, e));
+            merged.exercise = Array.from(exMap.values()).sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            return merged;
+        }
+
+        // --- 體重警示邏輯 (v4.5 邏輯維持) ---
         function getWeightStatus(record) {
             const p = userData.profile;
             if(!p) return [];
             const alerts = [];
             const totalDiff = record.val - p.w;
+
             if(record.week <= 12) {
                 if(totalDiff < 0) {
                     alerts.push({ type: 'info', msg: "💡 提醒：懷孕前期因賀爾蒙變化，產生噁心嘔吐，體重沒有變化甚至減輕是正常的現象。" });
@@ -277,33 +584,28 @@
                 const prevRecords = userData.weights.filter(w => w.week < record.week).sort((a,b) => b.week - a.week);
                 if(prevRecords.length > 0) {
                     const prev = prevRecords[0];
-                    const weekDiff = record.week - prev.week;
-                    const weightDiff = record.val - prev.val;
-                    const weeklySpeed = weightDiff / weekDiff;
-                    let speedLimit = 0.5;
-                    if(p.bmi >= 25.0 && p.bmi <= 29.9) speedLimit = 0.3;
-                    if(p.bmi >= 30.0) speedLimit = 0.25;
-                    if(weeklySpeed > speedLimit + 0.05) {
-                        alerts.push({ type: 'danger', msg: `⚠️ 體重增重過快！目前每週增加 ${weeklySpeed.toFixed(2)}kg (建議速限: ${speedLimit}kg)。` });
+                    const weeklySpeed = (record.val - prev.val) / (record.week - prev.week);
+                    let limit = 0.5;
+                    if(p.bmi >= 25.0 && p.bmi <= 29.9) limit = 0.3;
+                    if(p.bmi >= 30.0) limit = 0.25;
+
+                    if(weeklySpeed > limit + 0.05) {
+                        alerts.push({ type: 'danger', msg: `⚠️ 體重增重過快！目前每週增加 ${weeklySpeed.toFixed(2)}kg (建議速限: ${limit}kg)。` });
                     }
                 }
             }
             return alerts;
         }
 
+        // --- 輸入/新增邏輯 ---
         window.saveProfile = () => {
             const h = parseFloat(document.getElementById('h').value) / 100;
             const w = parseFloat(document.getElementById('w').value);
-            if(!h || !w) return showToast("請輸入完整資料");
+            if(!h || !w) return showToast("請輸入身高體重");
             const bmi = (w / (h * h)).toFixed(1);
-            let target = "", cat = "";
-            if(bmi < 18.5) { cat = "過輕"; target = "12.5~18 kg"; }
-            else if(bmi < 25) { cat = "正常"; target = "11.5~16 kg"; }
-            else if(bmi < 30) { cat = "過重"; target = "7~11.5 kg"; }
-            else { cat = "肥胖"; target = "5~9 kg"; }
-            userData.profile = { h, w, bmi: parseFloat(bmi), cat, target };
-            save();
-            showToast("孕前資料已更新");
+            let target = bmi < 18.5 ? "12.5~18 kg" : bmi < 25 ? "11.5~16 kg" : bmi < 30 ? "7~11.5 kg" : "5~9 kg";
+            userData.profile = { h, w, bmi: parseFloat(bmi), cat: bmi < 18.5 ? "過輕" : bmi < 25 ? "正常" : "過重", target };
+            save(); showToast("孕前資料已設定");
         };
 
         window.addWeight = () => {
@@ -313,42 +615,43 @@
             if(!userData.profile) return showToast("請先設定孕前資料");
             userData.weights.push({ id: Date.now(), week, val, date: new Date().toLocaleDateString() });
             userData.weights.sort((a,b) => a.week - b.week);
-            save();
-            document.getElementById('now-w').value = '';
-            showToast("體重已紀錄");
+            save(); document.getElementById('now-w').value = ''; showToast("體重已紀錄");
         };
 
         window.addBP = () => {
             const sys = parseInt(document.getElementById('bp-sys').value);
             const dia = parseInt(document.getElementById('bp-dia').value);
             const dt = document.getElementById('bp-dt').value.replace('T', ' ');
-            if(!sys || !dia) return showToast("請輸入完整收縮壓與舒張壓");
+            if(!sys || !dia) return showToast("請輸入完整數值");
+            
+            // 如果時間相同就覆蓋
+            userData.bp = userData.bp.filter(x => x.date !== dt);
             userData.bp.unshift({ id: Date.now(), sys, dia, date: dt, type: document.getElementById('bp-type').value });
-            save();
-            showToast("血壓已紀錄");
+            save(); showToast("血壓已存檔");
         };
 
         window.addGlu = () => {
             const val = parseInt(document.getElementById('glu-val').value);
             const dt = document.getElementById('glu-dt').value.replace('T', ' ');
             if(!val) return showToast("請輸入血糖值");
+
+            userData.glu = userData.glu.filter(x => x.date !== dt);
             userData.glu.unshift({ id: Date.now(), val, date: dt, type: document.getElementById('glu-type').value });
-            save();
-            showToast("血糖已紀錄");
+            save(); showToast("血糖已存檔");
         };
 
         window.addExercise = () => {
             const name = document.getElementById('ex-name').value.trim();
             const duration = parseInt(document.getElementById('ex-duration').value);
             const dt = document.getElementById('ex-dt').value.replace('T', ' ');
-            if(!name) return showToast("請輸入運動項目名稱");
-            if(!duration) return showToast("請輸入運動時長");
+            if(!name || !duration) return showToast("請輸入完整運動內容");
+
+            userData.exercise = userData.exercise.filter(x => x.date !== dt);
             userData.exercise.unshift({ id: Date.now(), name, duration, date: dt });
-            save();
-            document.getElementById('ex-name').value = '';
+            save(); 
+            document.getElementById('ex-name').value = ''; 
             document.getElementById('ex-duration').value = '';
-            const msg = encourageMsgs[Math.floor(Math.random() * encourageMsgs.length)];
-            document.getElementById('encourage-msg').innerText = msg;
+            document.getElementById('encourage-msg').innerText = encourageMsgs[Math.floor(Math.random() * encourageMsgs.length)];
             document.getElementById('encourageModal').classList.remove('hidden');
         };
 
@@ -368,23 +671,10 @@
                 edema: document.getElementById('cu-edema').value,
                 next: document.getElementById('cu-next').value
             };
-            save();
-            showToast("產檢存檔成功");
+            save(); showToast("產檢存檔完成");
         };
 
-        window.triggerDelete = (type, id) => { pendingDelete = { type, id }; document.getElementById('confirmModal').classList.remove('hidden'); };
-        window.closeModal = () => { document.getElementById('confirmModal').classList.add('hidden'); };
-        window.executeDelete = () => {
-            const { type, id } = pendingDelete;
-            if(type === 'weight') userData.weights = userData.weights.filter(x => x.id !== id);
-            else if(type === 'bp') userData.bp = userData.bp.filter(x => x.id !== id);
-            else if(type === 'glu') userData.glu = userData.glu.filter(x => x.id !== id);
-            else if(type === 'exercise') userData.exercise = userData.exercise.filter(x => x.id !== id);
-            else if(type === 'checkup') delete userData.checkups[id];
-            else if(type === 'CLEAR_ALL') { localStorage.clear(); location.reload(); return; }
-            closeModal(); save(); showToast("已刪除紀錄");
-        };
-
+        // --- 修正回填邏輯 ---
         window.editRecord = (cat, id) => {
             let item;
             if(cat === 'bp') item = userData.bp.find(x => x.id === id);
@@ -395,35 +685,88 @@
                 document.getElementById('bp-dt').value = item.date.replace(' ', 'T');
                 document.getElementById('bp-sys').value = item.sys; document.getElementById('bp-dia').value = item.dia;
                 document.getElementById('bp-type').value = item.type;
+                showPage('health');
             } else if(cat === 'glu') {
                 document.getElementById('glu-dt').value = item.date.replace(' ', 'T');
                 document.getElementById('glu-val').value = item.val; document.getElementById('glu-type').value = item.type;
+                showPage('health');
             } else if(cat === 'ex') {
                 document.getElementById('ex-dt').value = item.date.replace(' ', 'T');
                 document.getElementById('ex-name').value = item.name; document.getElementById('ex-duration').value = item.duration;
+                showPage('exercise');
             }
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            showToast("已將資料帶回輸入框");
+            showToast("💡 資料已帶回上方，修正完再儲存即可覆盖時間相同的紀錄。");
         };
 
+        // --- 刪除機制 (與 Modal 綁定) ---
+        window.triggerDelete = (type, id) => { pendingAction = { type, id }; document.getElementById('confirmModal').classList.remove('hidden'); };
+        window.closeModal = () => { document.getElementById('confirmModal').classList.add('hidden'); };
+        window.executeDelete = () => {
+            const { type, id } = pendingAction;
+            if(type === 'weight') userData.weights = userData.weights.filter(x => x.id !== id);
+            else if(type === 'bp') userData.bp = userData.bp.filter(x => x.id !== id);
+            else if(type === 'glu') userData.glu = userData.glu.filter(x => x.id !== id);
+            else if(type === 'exercise') userData.exercise = userData.exercise.filter(x => x.id !== id);
+            else if(type === 'checkup') delete userData.checkups[id];
+            else if(type === 'CLEAR_ALL') { localStorage.clear(); location.reload(); return; }
+            closeModal(); save(); showToast("紀錄已刪除");
+        };
+
+        window.triggerClearAll = () => { pendingAction = { type: 'CLEAR_ALL', id: null }; document.getElementById('confirmModal').classList.remove('hidden'); };
+
+        // --- 備份管理 ---
+        window.exportBackup = () => {
+            const dataStr = JSON.stringify(userData);
+            const blob = new Blob([dataStr], { type: "application/json" });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `幸孕備份檔_${new Date().toLocaleDateString()}.json`;
+            a.click();
+            showToast("備份檔下載完成，可上傳至您的 Google Drive/LINE 保管");
+        };
+
+        window.importBackup = (input) => {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (imported.weights !== undefined) {
+                        userData = imported;
+                        save();
+                        showToast("🎉 資料還原成功！");
+                    } else { throw new Error(); }
+                } catch (err) {
+                    showToast("❌ 格式不支援，請確認是否為本系統導出的備份檔");
+                }
+            };
+            reader.readAsText(file);
+            input.value = "";
+        };
+
+        // --- 畫面渲染 ---
         function renderAll() {
             if(userData.profile) {
                 document.getElementById('bmi-result').classList.remove('hidden');
                 document.getElementById('bmi-result').innerHTML = `孕前 BMI: <b>${userData.profile.bmi}</b> (${userData.profile.cat})<br>建議增重目標: <span class="text-pink-600 font-bold">${userData.profile.target}</span>`;
             }
 
+            // 體重列表
             document.getElementById('weight-list').innerHTML = [...userData.weights].reverse().map(x => {
                 const alerts = getWeightStatus(x);
                 const alertHtml = alerts.map(a => `<div class="${a.type==='danger'?'text-red-500':'text-blue-500'} alert-text">${a.msg}</div>`).join('');
                 return `
-                <div class="p-3 border rounded-lg bg-white shadow-sm mb-2">
-                    <div class="flex justify-between items-center text-xs">
+                <div class="p-3 border rounded-lg bg-white shadow-sm mb-2 text-xs">
+                    <div class="flex justify-between items-center">
                         <div>W<b>${x.week}</b>: <strong class="text-pink-600 text-sm">${x.val} kg</strong><br><span class="text-gray-400 font-normal">${x.date}</span></div>
                         <button onclick="triggerDelete('weight', ${x.id})" class="delete-btn">刪除</button>
                     </div>
                     ${alertHtml}
                 </div>`}).join('');
 
+            // 產檢歷史
             const cuHistory = Object.keys(userData.checkups).map(k => ({ ...userData.checkups[k], k }));
             document.getElementById('checkup-history').innerHTML = cuHistory.sort((a,b) => b.k - a.k).map(x => `
                 <div class="card p-4 text-xs border-l-4 border-pink-400">
@@ -431,41 +774,50 @@
                         <span>${x.timesName} (W${x.week})</span>
                         <button onclick="triggerDelete('checkup', ${x.k})" class="delete-btn">刪除</button>
                     </div>
-                    <div class="grid grid-cols-2 gap-y-1 text-gray-500">
-                        <div>日期: ${x.date}</div><div>體重: ${x.weight}kg</div>
-                        <div>尿糖: ${x.sugar}</div><div>蛋白: ${x.protein}</div>
+                    <div class="grid grid-cols-2 gap-y-1.5 text-gray-500 border-t pt-2 mt-1">
+                        <div>日期: <span class="text-gray-700">${x.date}</span></div>
+                        <div>體重: <span class="text-gray-700">${x.weight} kg</span></div>
+                        <div>血壓: <span class="text-gray-700">${x.bp}</span></div>
+                        <div>胎心音: <span class="text-gray-700">${x.fhr}</span></div>
+                        <div>尿糖: <span class="font-bold ${x.sugar==='+'?'text-amber-600':''}">${x.sugar}</span></div>
+                        <div>蛋白: <span class="font-bold ${x.protein!=='-'?'text-amber-600':''}">${x.protein}</span></div>
                     </div>
-                    ${x.next ? `<div class="mt-2 text-amber-600 font-bold">下次預約: ${x.next}</div>` : ''}
-                </div>`).join('') || '<div class="text-center text-gray-300 py-10 text-xs font-bold italic">目前尚無產檢存檔</div>';
+                    ${x.next ? `<div class="mt-2 text-amber-600 font-bold border-t pt-1.5">下次預約: ${x.next}</div>` : ''}
+                </div>`).join('') || '<div class="text-center text-gray-300 py-10 text-xs font-bold">目前無產檢紀錄</div>';
 
+            // 血壓列表
             const bpMap = { morning: '晨起', night: '睡前', anytime: '一般' };
             document.getElementById('bp-list').innerHTML = userData.bp.map(x => {
-                const isHigh = parseInt(x.sys) >= 140 || parseInt(x.dia) >= 90;
-                return `<div class="p-3 border rounded bg-white text-xs flex justify-between items-center shadow-sm">
-                    <div><b>${x.sys}/${x.dia}</b> <span class="${isHigh?'text-red-500 font-bold':'text-green-500'}">${isHigh?'⚠️偏高':'正常'}</span> (${bpMap[x.type]})<br>
+                const sys = parseInt(x.sys), dia = parseInt(x.dia);
+                const isHigh = sys >= 140 || dia >= 90;
+                const isLow = sys < 90 || dia < 60;
+                return `<div class="p-3 border rounded bg-white text-xs flex justify-between items-center shadow-sm mb-2">
+                    <div><b>${x.sys}/${x.dia}</b> <span class="text-[9px]">mmHg</span> 
+                    <span class="${isHigh?'text-red-500 font-bold':isLow?'text-blue-500 font-bold':'text-green-500'}">${isHigh?'⚠️偏高':isLow?'⚠️偏低':'正常'}</span> (${bpMap[x.type] || '一般'})<br>
                     <span onclick="editRecord('bp', ${x.id})" class="time-link text-gray-400">${x.date}</span></div>
                     <button onclick="triggerDelete('bp', ${x.id})" class="delete-btn">刪除</button>
                 </div>`}).join('');
 
+            // 血糖列表
             const gluMap = { fasting: '空腹', after2h: '飯後2h', other: '其他' };
             document.getElementById('glu-list').innerHTML = userData.glu.map(x => {
                 const limit = x.type === 'fasting' ? 95 : 120;
                 const isHigh = x.val >= limit;
-                return `<div class="p-3 border rounded bg-white text-xs flex justify-between items-center shadow-sm">
-                    <div><b>${x.val}</b> <span class="${isHigh?'text-red-500 font-bold':'text-green-500'}">${isHigh?'⚠️偏高':'正常'}</span> (${gluMap[x.type]})<br>
+                const isLow = x.val < 60;
+                return `<div class="p-3 border rounded bg-white text-xs flex justify-between items-center shadow-sm mb-2">
+                    <div><b>${x.val}</b> <span class="text-[9px]">mg/dL</span> 
+                    <span class="${isHigh?'text-red-500 font-bold':isLow?'text-blue-500 font-bold':'text-green-500'}">${isHigh?'⚠️偏高':isLow?'⚠️偏低':'正常'}</span> (${gluMap[x.type] || '其他'})<br>
                     <span onclick="editRecord('glu', ${x.id})" class="time-link text-gray-400">${x.date}</span></div>
                     <button onclick="triggerDelete('glu', ${x.id})" class="delete-btn">刪除</button>
                 </div>`}).join('');
 
-            document.getElementById('exercise-list').innerHTML = (userData.exercise || []).map(x => `
-                <div class="p-3 border rounded bg-white text-xs flex justify-between items-center shadow-sm border-purple-100 mb-2">
-                    <div>
-                        <span class="bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full text-[9px] font-bold mr-1">${x.name}</span>
-                        <b>${x.duration}</b> 分鐘<br>
-                        <span onclick="editRecord('ex', ${x.id})" class="time-link text-gray-400">${x.date}</span>
-                    </div>
+            // 運動列表
+            document.getElementById('exercise-list').innerHTML = userData.exercise.map(x => `
+                <div class="p-3 border rounded bg-white text-xs flex justify-between items-center shadow-sm mb-2">
+                    <div><span class="bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full text-[9px] font-bold mr-1">${x.name}</span><b>${x.duration}</b> 分鐘<br>
+                    <span onclick="editRecord('ex', ${x.id})" class="time-link text-gray-400">${x.date}</span></div>
                     <button onclick="triggerDelete('exercise', ${x.id})" class="delete-btn">刪除</button>
-                </div>`).join('') || '<div class="text-center text-gray-300 py-10 text-xs italic">尚未開始運動紀錄喔！</div>';
+                </div>`).join('') || '<div class="text-center text-gray-300 py-10 text-xs italic">尚未紀錄任何好孕動動</div>';
             
             updateChart();
         }
@@ -473,10 +825,10 @@
         window.showPage = (p) => {
             ['bmi', 'checkup', 'health', 'exercise', 'data'].forEach(x => {
                 document.getElementById('page-'+x).classList.add('hidden');
-                document.getElementById('btn-'+x).className = 'px-4 py-3 text-gray-400';
+                document.getElementById('btn-'+x).className = 'flex-1 py-3 text-gray-400';
             });
             document.getElementById('page-'+p).classList.remove('hidden');
-            document.getElementById('btn-'+p).className = 'px-4 py-3 tab-active';
+            document.getElementById('btn-'+p).className = 'flex-1 py-3 tab-active';
             if(p === 'bmi') setTimeout(updateChart, 50);
         }
 
@@ -500,23 +852,24 @@
             const t = checkupTemplates.find(x => x.id == id);
             const data = userData.checkups[id] || {};
             document.getElementById('cu-week').value = data.week || (t.week || "");
+            document.getElementById('cu-date').value = data.date || new Date().toISOString().split('T')[0];
+            document.getElementById('cu-weight').value = data.weight || "";
+            document.getElementById('cu-bp').value = data.bp || "";
+            document.getElementById('cu-fhr').value = data.fhr || "";
             document.getElementById('cu-sugar').value = data.sugar || "-";
             document.getElementById('cu-protein').value = data.protein || "-";
             document.getElementById('cu-edema').value = data.edema || "-";
-            document.getElementById('cu-note').value = data.note || "無特殊發現";
+            document.getElementById('cu-next').value = data.next || "";
         }
 
-        window.exportData = () => {
+        window.exportCSV = () => {
             let csv = "\ufeff日期,項目,詳情,數值\n";
-            userData.weights.forEach(x => csv += `${x.date},體重,W${x.week},${x.val}kg\n`);
-            userData.bp.forEach(x => csv += `${x.date},血壓,${bpMap[x.type]},${x.sys}/${x.dia}\n`);
-            userData.glu.forEach(x => csv += `${x.date},血糖,${gluMap[x.type]},${x.val}\n`);
-            userData.exercise.forEach(x => csv += `${x.date},運動,${x.name},${x.duration}分鐘\n`);
+            userData.weights.forEach(x => csv += `${x.date},體重紀錄,第${x.week}週,${x.val}kg\n`);
+            userData.bp.forEach(x => csv += `${x.date},血壓紀錄,${bpMap[x.type] || '一般'},${x.sys}/${x.dia} mmHg\n`);
+            userData.glu.forEach(x => csv += `${x.date},血糖紀錄,${gluMap[x.type] || '其他'},${x.val} mg/dL\n`);
+            userData.exercise.forEach(x => csv += `${x.date},運動紀錄,${x.name},${x.duration} 分鐘\n`);
             const blob = new Blob([csv], { type: 'text/csv' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `幸孕紀錄_v4.8_${new Date().toLocaleDateString()}.csv`;
-            a.click();
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `幸孕檔案夾紀錄_${new Date().toLocaleDateString()}.csv`; a.click();
         }
 
         window.onload = init;
